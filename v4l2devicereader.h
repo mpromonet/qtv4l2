@@ -1,3 +1,10 @@
+/* ---------------------------------------------------------------------------
+** This software is in the public domain, furnished "as is", without technical
+** support, and with no warranty, express or implied, as to its usefulness for
+** any purpose.
+**
+** -------------------------------------------------------------------------*/
+
 #ifndef V4L2DEVICEREADER_H
 #define V4L2DEVICEREADER_H
 
@@ -5,17 +12,16 @@
 #include <QSocketNotifier>
 
 #include "V4l2Capture.h"
-#include "mainwindow.h"
 
 class V4L2DeviceReader : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit V4L2DeviceReader(QObject *parent = 0);
-    V4L2DeviceReader(V4l2Capture* videoCapture, MainWindow * w, QObject *parent = 0);
+    V4L2DeviceReader(V4l2Capture* videoCapture, QObject *parent = 0);
 
 signals:
-    void dataReceived();
+    void dataReceived(QPixmap*);
 
 public slots:
     void handleRead();
@@ -23,7 +29,6 @@ public slots:
 private:
     QSocketNotifier m_notifier;
     V4l2Capture*    m_videoCapture;
-    MainWindow*     m_mainWindow;
 };
 
 #endif // V4L2DEVICEREADER_H

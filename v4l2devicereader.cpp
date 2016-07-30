@@ -1,3 +1,11 @@
+/* ---------------------------------------------------------------------------
+** This software is in the public domain, furnished "as is", without technical
+** support, and with no warranty, express or implied, as to its usefulness for
+** any purpose.
+**
+** -------------------------------------------------------------------------*/
+
+#include <QPixmap>
 
 #include "v4l2devicereader.h"
 #include "logger.h"
@@ -57,11 +65,10 @@ unsigned long yuyv2jpeg(char* image_buffer, unsigned int width, unsigned int hei
 }
 
 
-V4L2DeviceReader::V4L2DeviceReader(V4l2Capture* videoCapture, MainWindow * w, QObject *parent)
+V4L2DeviceReader::V4L2DeviceReader(V4l2Capture* videoCapture, QObject *parent)
     : QObject(parent)
     , m_notifier(videoCapture->getFd(), QSocketNotifier::Read)
     , m_videoCapture(videoCapture)
-    , m_mainWindow(w)
 {
     connect(&m_notifier, SIGNAL(activated(int)), this, SLOT(handleRead()));
 }
@@ -74,16 +81,17 @@ void V4L2DeviceReader::handleRead()
 
     char buffer[bufferSize];
     size_t nb = m_videoCapture->read(buffer, bufferSize );
-    std::cout << "image size:" << nb << std::endl;
+    LOG(DEBUG) << "image size:" << nb;
 
     size_t size = yuyv2jpeg(buffer, width, height, 95);
-    std::cout << "jpeg size:" << size << std::endl;
+    LOG(DEBUG) << "jpeg size:" << size;
 
     QPixmap pixmap(width, height);
-    bool ret = pixmap.loadFromData((const uchar*)buffer, sizeof(buffer));
-    std::cout << ret << std::endl;
+    if (!pixmap.loadFromData((const uchar*)buffer, sizeof(buffer)))
+    {
+        LOG(WARN) << "cannot load data to QPixmap";
+    }
 
-    m_mainWindow->writePixmap(pixmap);
-
-    emit dataReceived();
+    // signal
+    emit dataReceived(&pixmap);
 }
