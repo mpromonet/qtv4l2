@@ -24,10 +24,14 @@ public:
 
     void writeDeviceName(const QString & deviceName);
     void writeCaptureSize(int width, int height);
-    void addSliderControl(const QString & ctrl, int value, int min, int max);
+    void addSliderControl(const QString & ctrl, int min, int max, int id, int value);
+
+signals:
+    void controlUpdated(int, int);
 
 private slots:
     void writePixmap(QPixmap * pixmap);
+    void sliderUpdated(int value);
 
 private:
     Ui::MainWindow *ui;

@@ -42,14 +42,26 @@ void MainWindow::writePixmap(QPixmap * pixmap)
     ui->graphicsView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
-void MainWindow::addSliderControl(const QString & ctrl, int value, int min, int max)
+void MainWindow::addSliderControl(const QString & ctrl, int min, int max, int id, int value)
 {
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(new QLabel(ctrl));
     QSlider* slider = new QSlider(Qt::Horizontal);
+    slider->setProperty("id",id);
     slider->setMinimum(min);
     slider->setMaximum(max);
     slider->setValue(value);
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderUpdated(int)));
     layout->addWidget(slider);
     ui->propertiesLayout->addLayout(layout);
+}
+
+void MainWindow::sliderUpdated(int value)
+{
+    // retreive control id
+    QSlider* slider = (QSlider*)sender();
+    int id = slider->property("id").toInt();
+
+    // signal update
+    emit controlUpdated(id, value);
 }

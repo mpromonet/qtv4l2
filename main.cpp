@@ -13,6 +13,7 @@
 #include "logger.h"
 #include "V4l2Capture.h"
 #include "v4l2devicereader.h"
+#include "v4l2devicecontroler.h"
 #include "mainwindow.h"
 
 unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
@@ -23,6 +24,7 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
     qctrl.id = i;
     if (0 == ioctl(fd,VIDIOC_QUERYCTRL,&qctrl))
     {
+        LOG(NOTICE) << qctrl.name;
         if (!(qctrl.flags & V4L2_CTRL_FLAG_DISABLED))
         {
             struct v4l2_control control;
@@ -60,7 +62,7 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
                 }
                 else
                 {
-                    w.addSliderControl((const char*)qctrl.name, control.value, qctrl.minimum, qctrl.maximum);
+                    w.addSliderControl((const char*)qctrl.name, qctrl.minimum, qctrl.maximum, control.id, control.value);
                 }
             }
         }
@@ -74,19 +76,22 @@ int main(int argc, char *argv[])
     // create command line parser
     QCommandLineParser parser;
     parser.addHelpOption();
-    parser.addVersionOption();
     QCommandLineOption deviceOpt("d", "device", "V4L2 device name", "/dev/video0");
     parser.addOption(deviceOpt);
     QCommandLineOption widthOpt("W", "width", "capture width", "0");
     parser.addOption(widthOpt);
     QCommandLineOption heightOpt("H", "height", "capture height", "0");
     parser.addOption(heightOpt);
+    QCommandLineOption verboseOpt("v", "verbose", "verbosity", "0");
+    parser.addOption(verboseOpt);
 
     // parse command line
     QApplication application(argc, argv);
     parser.process(application);
-
     QString deviceName(parser.value(deviceOpt));
+
+    // initialize log4cpp
+    initLogger(parser.value(verboseOpt).toInt());
 
     int ret = -1;
     // create capture interface
@@ -94,25 +99,34 @@ int main(int argc, char *argv[])
                                , V4L2_PIX_FMT_YUYV
                                , parser.value(widthOpt).toInt()
                                , parser.value(heightOpt).toInt()
-                               , 0, 255);
+                               , 0
+                               , 255);
     V4l2Capture* videoCapture = V4l2DeviceFactory::CreateVideoCapure(param, V4l2DeviceFactory::IOTYPE_MMAP);
     if (videoCapture)
     {
-        V4L2DeviceReader reader(videoCapture);
-
         // create window
         MainWindow w;
         w.writeDeviceName(deviceName);
         w.writeCaptureSize(videoCapture->getWidth(), videoCapture->getHeight());
-        w.show();
-
-        // connect reader signal to window slot
-        QObject::connect(&reader, SIGNAL(dataReceived(QPixmap*)), &w, SLOT(writePixmap(QPixmap*)));
 
         // add controls
         int fd = videoCapture->getFd();
         for (unsigned int i = V4L2_CID_BASE; i<V4L2_CID_LASTP1; add_ctrl(fd,i,w), i++);
         for (unsigned int i = V4L2_CID_LASTP1+1; i != 0 ; i=add_ctrl(fd,i|V4L2_CTRL_FLAG_NEXT_CTRL,w));
+
+        w.show();
+
+        // V4L2 reader
+        V4L2DeviceReader reader(videoCapture);
+
+        // connect reader signal to window slot
+        QObject::connect(&reader, SIGNAL(dataReceived(QPixmap*)), &w, SLOT(writePixmap(QPixmap*)));
+
+        // V4L2 control
+        V4L2DeviceControler controler(videoCapture->getFd());
+
+        // connect slider update signal to control slot
+        QObject::connect(&w, SIGNAL(controlUpdated(int,int)), &controler, SLOT(controlUpdated(int,int)));
 
         ret = application.exec();
     }
