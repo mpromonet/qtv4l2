@@ -24,6 +24,7 @@ public:
 
     void writeDeviceName(const QString & deviceName);
     void writeCaptureSize(int width, int height);
+    void addSliderControl(const QString & ctrl, int value, int min, int max);
 
 private slots:
     void writePixmap(QPixmap * pixmap);

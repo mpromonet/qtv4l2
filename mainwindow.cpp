@@ -41,3 +41,15 @@ void MainWindow::writePixmap(QPixmap * pixmap)
     scene->addPixmap(*pixmap);
     ui->graphicsView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
+
+void MainWindow::addSliderControl(const QString & ctrl, int value, int min, int max)
+{
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(new QLabel(ctrl));
+    QSlider* slider = new QSlider(Qt::Horizontal);
+    slider->setMinimum(min);
+    slider->setMaximum(max);
+    slider->setValue(value);
+    layout->addWidget(slider);
+    ui->propertiesLayout->addLayout(layout);
+}
