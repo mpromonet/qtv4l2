@@ -10,8 +10,6 @@
 
 #include <QMainWindow>
 
-#include "v4l2devicereader.h"
-
 namespace Ui {
 class MainWindow;
 }
@@ -21,10 +19,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(V4L2DeviceReader & v4l2reader, QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void writeLabel(const QString & deviceName);
+    void writeDeviceName(const QString & deviceName);
+    void writeCaptureSize(int width, int height);
 
 private slots:
     void writePixmap(QPixmap * pixmap);

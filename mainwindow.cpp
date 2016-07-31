@@ -8,13 +8,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(V4L2DeviceReader &v4l2reader, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene());
-    connect(&v4l2reader, SIGNAL(dataReceived(QPixmap*)), this, SLOT(writePixmap(QPixmap*)));
 }
 
 MainWindow::~MainWindow()
@@ -22,10 +21,18 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::writeLabel(const QString & deviceName)
+void MainWindow::writeDeviceName(const QString & deviceName)
 {
     ui->DeviceName->setText(deviceName);
 }
+
+void MainWindow::writeCaptureSize(int width, int height)
+{
+    QString geometry;
+    geometry.sprintf("%dx%d",width,height);
+    ui->Geometry->setText(geometry);
+}
+
 
 void MainWindow::writePixmap(QPixmap * pixmap)
 {
