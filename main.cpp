@@ -62,7 +62,7 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
                 }
                 else
                 {
-                    w.addSliderControl((const char*)qctrl.name, qctrl.minimum, qctrl.maximum, control.id, control.value);
+                    w.addSliderControl((const char*)qctrl.name, qctrl.minimum, qctrl.maximum, qctrl.step, control.id, control.value);
                 }
             }
         }
