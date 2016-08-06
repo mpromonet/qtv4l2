@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QList>
 
 #include <stropts.h>
 
@@ -38,6 +39,7 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
 #endif
                    )
                 {
+                    QList<QPair<int, QString>> texts;
                     struct v4l2_querymenu querymenu;
                     memset(&querymenu,0,sizeof(querymenu));
                     querymenu.id = qctrl.id;
@@ -57,8 +59,12 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
                                 label = (int)querymenu.value;
                             }
 #endif
+                            texts.append(QPair<int, QString>((int)querymenu.index,label));
                         }
                     }
+
+                    w.addCombobox((const char*)qctrl.name, texts, control.id, control.value);
+
                 }
                 else
                 {
