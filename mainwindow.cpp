@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene());
+    ui->scrollArea->setWidgetResizable(true);
+    ui->scrollArea->widget()->setLayout(ui->propertiesLayout);
 }
 
 MainWindow::~MainWindow()
