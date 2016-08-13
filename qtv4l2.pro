@@ -8,7 +8,12 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = qtv4l2
+TARGET = $$basename(_PRO_FILE_PWD_)
+OBJECTS_DIR = $$PWD/obj
+MOC_DIR =     $$PWD/moc
+RCC_DIR =     $$PWD/rcc
+UI_DIR =      $$PWD/gui
+
 TEMPLATE = app
 
 
