@@ -26,7 +26,7 @@ public:
     void writeDeviceName(const QString & deviceName);
     void writeCaptureSize(int width, int height);
     void addSliderControl(const QString & ctrl, int min, int max, int step, int id, int value);
-    void addCombobox(const QString & ctrl, const QList<QPair<int, QString>> & texts, int id, int value);
+    void addCombobox(const QString & ctrl, const QList< QPair<int, QString> > & texts, int id, int value);
 
 signals:
     void controlUpdated(int, int);

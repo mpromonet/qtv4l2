@@ -39,7 +39,7 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
 #endif
                    )
                 {
-                    QList<QPair<int, QString>> texts;
+                    QList< QPair<int, QString> > texts;
                     struct v4l2_querymenu querymenu;
                     memset(&querymenu,0,sizeof(querymenu));
                     querymenu.id = qctrl.id;
@@ -84,9 +84,9 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     QCommandLineOption deviceOpt("d", "device", "V4L2 device name", "/dev/video0");
     parser.addOption(deviceOpt);
-    QCommandLineOption widthOpt("W", "width", "capture width", "0");
+    QCommandLineOption widthOpt("W", "width", "capture width", "640");
     parser.addOption(widthOpt);
-    QCommandLineOption heightOpt("H", "height", "capture height", "0");
+    QCommandLineOption heightOpt("H", "height", "capture height", "480");
     parser.addOption(heightOpt);
     QCommandLineOption verboseOpt("v", "verbose", "verbosity", "0");
     parser.addOption(verboseOpt);

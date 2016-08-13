@@ -72,11 +72,11 @@ void MainWindow::sliderChanged(int value)
     emit controlUpdated(id, value);
 }
 
-void MainWindow::addCombobox(const QString & ctrl, const QList<QPair<int, QString>> & texts, int id, int value)
+void MainWindow::addCombobox(const QString & ctrl, const QList< QPair<int, QString> > & texts, int id, int value)
 {
     QComboBox* comboBox = new QComboBox();
     comboBox->setProperty("id",id);
-    QList<QPair<int, QString>>::const_iterator it;
+    QList< QPair<int, QString> >::const_iterator it;
     for (it = texts.begin(); it != texts.end(); ++it)
     {
         comboBox->addItem(it->second,it->first);
