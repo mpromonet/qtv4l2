@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
                                , parser.value(heightOpt).toInt()
                                , 0
                                , 255);
-    V4l2Capture* videoCapture = V4l2DeviceFactory::CreateVideoCapture(param, V4l2DeviceFactory::IOTYPE_MMAP);
+    V4l2Capture* videoCapture = V4l2Capture::create(param, V4l2Access::IOTYPE_MMAP);
     if (videoCapture)
     {
         // create window

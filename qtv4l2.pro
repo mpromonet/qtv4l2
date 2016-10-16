@@ -21,24 +21,18 @@ SOURCES += main.cpp\
         mainwindow.cpp \
         v4l2devicereader.cpp \
     libv4l2cpp/src/V4l2Capture.cpp \
-    libv4l2cpp/src/V4l2Device.cpp \
-    libv4l2cpp/src/V4l2MmapCapture.cpp \
-    libv4l2cpp/src/V4l2MmapDevice.cpp \
-    libv4l2cpp/src/V4l2MmapOutput.cpp \
     libv4l2cpp/src/V4l2Output.cpp \
-    libv4l2cpp/src/V4l2ReadCapture.cpp \  
+    libv4l2cpp/src/V4l2Device.cpp \
+    libv4l2cpp/src/V4l2MmapDevice.cpp \
     v4l2devicecontroler.cpp
 
 HEADERS  += mainwindow.h \
             v4l2devicereader.h \
     libv4l2cpp/inc/logger.h \
     libv4l2cpp/inc/V4l2Capture.h \
-    libv4l2cpp/inc/V4l2Device.h \
-    libv4l2cpp/inc/V4l2MmapCapture.h \
-    libv4l2cpp/inc/V4l2MmapDevice.h \
-    libv4l2cpp/inc/V4l2MmapOutput.h \
     libv4l2cpp/inc/V4l2Output.h \
-    libv4l2cpp/inc/V4l2ReadCapture.h \  
+    libv4l2cpp/inc/V4l2Device.h \
+    libv4l2cpp/inc/V4l2MmapDevice.h \
     v4l2devicecontroler.h
 
 FORMS    += mainwindow.ui
