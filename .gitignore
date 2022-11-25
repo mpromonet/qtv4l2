@@ -2,3 +2,7 @@ obj/
 gui/
 moc/
 *.user
+Makefile
+.vscode
+qtv4l2
+.qmake*

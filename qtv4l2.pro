@@ -21,9 +21,12 @@ SOURCES += src/main.cpp\
         src/mainwindow.cpp \
         src/v4l2devicereader.cpp \
 	src/v4l2devicecontroler.cpp \
+    libv4l2cpp/src/logger.cpp \
+    libv4l2cpp/src/V4l2Access.cpp \
     libv4l2cpp/src/V4l2Capture.cpp \
     libv4l2cpp/src/V4l2Output.cpp \
     libv4l2cpp/src/V4l2Device.cpp \
+    libv4l2cpp/src/V4l2ReadWriteDevice.cpp \
     libv4l2cpp/src/V4l2MmapDevice.cpp 
 
 HEADERS  += inc/mainwindow.h \
@@ -38,4 +41,4 @@ HEADERS  += inc/mainwindow.h \
 FORMS    += mainwindow.ui
 
 INCLUDEPATH += $$PWD/libv4l2cpp/inc $$PWD/inc
-LIBS  += -llog4cpp -ljpeg
+LIBS  += -ljpeg
