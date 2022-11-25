@@ -29,9 +29,9 @@ void MainWindow::writeDeviceName(const QString & deviceName)
 
 void MainWindow::writeCaptureSize(int width, int height)
 {
-    QString geometry;
-    geometry.sprintf("%dx%d",width,height);
-    ui->Geometry->setText(geometry);
+    QString geometry_str_params;
+    QTextStream(&geometry_str_params) << width << "x" << height;
+    ui->Geometry->setText(geometry_str_params);
 }
 
 

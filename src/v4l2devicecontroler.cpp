@@ -5,7 +5,7 @@
 **
 ** -------------------------------------------------------------------------*/
 
-#include <stropts.h>
+#include <sys/ioctl.h>
 #include <errno.h>
 #include <linux/videodev2.h>
 

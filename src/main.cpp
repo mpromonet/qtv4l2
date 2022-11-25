@@ -9,7 +9,7 @@
 #include <QCommandLineParser>
 #include <QList>
 
-#include <stropts.h>
+#include <sys/ioctl.h>
 
 #include "logger.h"
 #include "V4l2Capture.h"
