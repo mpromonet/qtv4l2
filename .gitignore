@@ -1,3 +1,4 @@
 obj/
 gui/
 moc/
+*.user
