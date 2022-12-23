@@ -25,7 +25,7 @@ unsigned int add_ctrl(int fd, unsigned int i, MainWindow & w)
     qctrl.id = i;
     if (0 == ioctl(fd,VIDIOC_QUERYCTRL,&qctrl))
     {
-        LOG(NOTICE) << qctrl.name;
+        LOG(NOTICE) << qctrl.name << " min= " << qctrl.minimum << " max= " << qctrl.maximum << " step= " << qctrl.step;
         if (!(qctrl.flags & V4L2_CTRL_FLAG_DISABLED))
         {
             struct v4l2_control control;

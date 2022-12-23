@@ -10,6 +10,7 @@
 
 #include <QMainWindow>
 #include <QList>
+#include <QMessageBox>
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +36,7 @@ private slots:
     void writePixmap(QPixmap * pixmap);
     void sliderChanged(int value);
     void comboBoxChanged(int value);
+    void about();
 
 private:
     Ui::MainWindow *ui;

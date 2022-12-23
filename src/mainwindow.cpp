@@ -16,6 +16,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene());
+
+    QAction *aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setShortcut(QKeySequence::HelpContents); //for F1 key
+    connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
+    ui->menuHelp->addAction(aboutAct);
 }
 
 MainWindow::~MainWindow()
@@ -106,3 +111,10 @@ void MainWindow::comboBoxChanged(int idx)
     emit controlUpdated(id, value);
 }
 
+void MainWindow::about()
+{
+    QMessageBox::about(this, tr("About my qtv4l2 "),
+                       tr("This example demonstrates how to use\n"
+                          "Qt with v4l2 driver (cameras)\n"
+                          "github.com/mpromonet/qtv4l2"));
+}
