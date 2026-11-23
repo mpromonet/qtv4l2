@@ -5,63 +5,18 @@
 **
 ** -------------------------------------------------------------------------*/
 
+#include <QByteArray>
+#include <QImage>
 #include <QPixmap>
 
 #include "v4l2devicereader.h"
 #include "logger.h"
 
-#include <jpeglib.h>
+#include <climits>
 
-unsigned long yuyv2jpeg(char* image_buffer, unsigned int width, unsigned int height, unsigned int quality)
+static int clampColor(int value)
 {
-    struct jpeg_error_mgr jerr;
-    struct jpeg_compress_struct cinfo;
-    jpeg_create_compress(&cinfo);
-    cinfo.image_width = width;
-    cinfo.image_height = height;
-    cinfo.input_components = 3;
-    cinfo.err = jpeg_std_error(&jerr);
-
-    unsigned char* dest = NULL;
-    unsigned long  destsize = 0;
-    jpeg_mem_dest(&cinfo, &dest, &destsize);
-    jpeg_set_defaults(&cinfo);
-    jpeg_set_quality(&cinfo, quality, TRUE);
-    jpeg_start_compress(&cinfo, TRUE);
-
-    unsigned char bufline[cinfo.image_width * 3];
-    while (cinfo.next_scanline < cinfo.image_height)
-    {
-        // convert line from YUYV -> YUV
-        for (unsigned int i = 0; i < cinfo.image_width; i += 2)
-        {
-            unsigned int base = cinfo.next_scanline*cinfo.image_width * 2 ;
-            bufline[i*3  ] = image_buffer[base + i*2  ];
-            bufline[i*3+1] = image_buffer[base + i*2+1];
-            bufline[i*3+2] = image_buffer[base + i*2+3];
-            bufline[i*3+3] = image_buffer[base + i*2+2];
-            bufline[i*3+4] = image_buffer[base + i*2+1];
-            bufline[i*3+5] = image_buffer[base + i*2+3];
-        }
-        JSAMPROW row = bufline;
-        jpeg_write_scanlines(&cinfo, &row, 1);
-    }
-    jpeg_finish_compress(&cinfo);
-    if (dest != NULL)
-    {
-        if (destsize < width*height*2)
-        {
-            memcpy(image_buffer, dest, destsize);
-        }
-        else
-        {
-            LOG(WARN) << "Buffer to small size:" << width*height*2 << " " << destsize;
-        }
-        free(dest);
-    }
-    jpeg_destroy_compress(&cinfo);
-
-    return destsize;
+    return value < 0 ? 0 : (value > 255 ? 255 : value);
 }
 
 
@@ -77,20 +32,60 @@ void V4L2DeviceReader::handleRead()
 {
     int width  = m_videoCapture->getWidth();
     int height = m_videoCapture->getHeight();
-    int bufferSize = m_videoCapture->getBufferSize();
+    unsigned int bufferSize = m_videoCapture->getBufferSize();
 
-    char buffer[bufferSize];
-    size_t nb = m_videoCapture->read(buffer, bufferSize );
+    if (width <= 0 || height <= 0 || width % 2 != 0 ||
+        bufferSize > static_cast<unsigned int>(INT_MAX))
+    {
+        LOG(ERROR) << "Invalid YUYV frame dimensions or buffer size";
+        return;
+    }
+
+    QByteArray buffer(static_cast<int>(bufferSize), '\0');
+    size_t nb = m_videoCapture->read(buffer.data(), buffer.size());
     LOG(DEBUG) << "image size:" << nb;
 
-    size_t size = yuyv2jpeg(buffer, width, height, 95);
-    LOG(DEBUG) << "jpeg size:" << size;
-
-    QPixmap pixmap(width, height);
-    if (!pixmap.loadFromData((const uchar*)buffer, sizeof(buffer)))
+    const size_t frameSize = static_cast<size_t>(width) * height * 2;
+    if (nb < frameSize || nb > static_cast<size_t>(buffer.size()))
     {
-        LOG(WARN) << "cannot load data to QPixmap";
+        LOG(ERROR) << "Incomplete or invalid YUYV frame:" << nb << " expected at least:" << frameSize;
+        return;
     }
+
+    QImage image(width, height, QImage::Format_RGB32);
+    if (image.isNull())
+    {
+        LOG(ERROR) << "Cannot allocate image:" << width << "x" << height;
+        return;
+    }
+
+    const unsigned char* yuyv = reinterpret_cast<const unsigned char*>(buffer.constData());
+    for (int y = 0; y < height; ++y)
+    {
+        QRgb* pixels = reinterpret_cast<QRgb*>(image.scanLine(y));
+        const unsigned char* row = yuyv + static_cast<size_t>(y) * width * 2;
+        for (int x = 0; x < width; x += 2)
+        {
+            const int y0 = row[x * 2];
+            const int u = row[x * 2 + 1] - 128;
+            const int y1 = row[x * 2 + 2];
+            const int v = row[x * 2 + 3] - 128;
+            const int chromaU = 516 * u;
+            const int red = 409 * v;
+            const int green = -100 * u - 208 * v;
+
+            const int c0 = 298 * (y0 - 16);
+            const int c1 = 298 * (y1 - 16);
+            pixels[x] = qRgb(clampColor((c0 + red + 128) >> 8),
+                             clampColor((c0 + green + 128) >> 8),
+                             clampColor((c0 + chromaU + 128) >> 8));
+            pixels[x + 1] = qRgb(clampColor((c1 + red + 128) >> 8),
+                                 clampColor((c1 + green + 128) >> 8),
+                                 clampColor((c1 + chromaU + 128) >> 8));
+        }
+    }
+
+    QPixmap pixmap = QPixmap::fromImage(image);
 
     // signal
     emit dataReceived(&pixmap);

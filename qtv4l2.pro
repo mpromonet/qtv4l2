@@ -41,4 +41,3 @@ HEADERS  += inc/mainwindow.h \
 FORMS    += mainwindow.ui
 
 INCLUDEPATH += $$PWD/libv4l2cpp/inc $$PWD/inc
-LIBS  += -ljpeg

@@ -88,6 +88,8 @@ int main(int argc, char *argv[])
     parser.addOption(widthOpt);
     QCommandLineOption heightOpt("H", "height", "capture height", "480");
     parser.addOption(heightOpt);
+    QCommandLineOption fpsOpt("f", "fps", "capture frame rate", "15");
+    parser.addOption(fpsOpt);   
     QCommandLineOption verboseOpt("v", "verbose", "verbosity", "0");
     parser.addOption(verboseOpt);
 
@@ -105,9 +107,7 @@ int main(int argc, char *argv[])
                                , V4L2_PIX_FMT_YUYV
                                , parser.value(widthOpt).toInt()
                                , parser.value(heightOpt).toInt()
-                               , 0
-                               , IOTYPE_MMAP
-                               , 255);
+                               , parser.value(fpsOpt).toInt());
     V4l2Capture* videoCapture = V4l2Capture::create(param);
     if (videoCapture)
     {
